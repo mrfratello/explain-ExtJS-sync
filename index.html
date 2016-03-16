@@ -45,8 +45,13 @@ Ext.create('Ext.data.Store', {
         reader: {
             type: 'json',
             root: 'data',
+        },
+        writer: {
+            type: 'json',
+            allowSingle: false,
+            writeAllFields: false
         }
-    },
+    }
 });
 
 
