@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Песочинца</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <link type="text/css" rel="stylesheet" href="/extjs/resources/css/ext-all.css"/>
+    <!-- <link type="text/css" rel="stylesheet" href="/extjs/resources/css/ext-neptune.css"/> -->
+    <script type="text/javascript" src="/extjs/ext-all.js"></script>
+<script type="text/javascript">
+
+Ext.require([
+    // 'Ext.data.*',
+    // 'Ext.grid.*',
+    // 'Ext.tree.*',
+    'Ext.grid.plugin.CellEditing'
+]);
+
+Ext.create('Ext.data.Store', {
+    autoLoad: true,
+    fields: [
+        {
+            name: 'name',
+            type: 'string'
+        },
+        {
+            name: 'age',
+            type: 'int'
+        },
+        {
+            name: 'other',
+            type: 'string'
+        }
+    ],
+    storeId: "some_data",
+
+    proxy: {
+        type: 'ajax',
+        url: 'data.php',
+        api: {
+            create: 'create.php',
+            read: 'data.php',
+            update: 'update.php',
+            destroy : 'delete.php'
+        },
+        reader: {
+            type: 'json',
+            root: 'data',
+        }
+    },
+});
+
+
+
+Ext.onReady(function() {
+
+    Ext.create('Ext.container.Viewport', {
+        layout: 'fit',
+
+        items: [
+            {
+                xtype: 'grid',
+                title: 'Some grid',
+                store: Ext.data.StoreManager.lookup('some_data'),
+                columns: [
+                    {
+                        text: "Name",
+                        dataIndex: "name",
+                        flex: 1,
+                        editor: {
+                            xtype: 'textfield'
+                        }
+                    },
+                    {
+                        text: "Age",
+                        dataIndex: "age",
+                        width: 100,
+                        editor: {
+                            xtype: 'numberfield'
+                        }
+                    },
+                    {
+                        text: "Other",
+                        dataIndex: "other",
+                        width: 300,
+                        editor: {
+                            xtype: 'textfield'
+                        }
+                    },
+                ],
+                plugins: [
+                    {
+                        ptype: 'cellediting',
+                        clicksToEdit: 1
+                    }
+               ],
+
+               tbar: [
+                   {
+                       text: 'Do Sync',
+                       listeners: {
+                           click: function(button) {
+                                var store = Ext.data.StoreManager.lookup('some_data');
+                                store.sync({
+                                    callback: function(batch, operations) {
+                                        console.log( batch );
+                                        console.log( operations );
+                                    }
+                                });
+                           }
+                       }
+                   },
+                   '-',
+                   {
+                       text: 'Change Second Row',
+                       listeners: {
+                           click: function(button) {
+                               var store = Ext.data.StoreManager.lookup('some_data');
+                               store.getAt(1).set('other', 'In is example 2');
+                           }
+                       }
+                   },
+                   '-',
+                   {
+                       text: 'Change Third Row',
+                       listeners: {
+                           click: function(button) {
+                               var store = Ext.data.StoreManager.lookup('some_data');
+                               store.getAt(2).set('other', 'In is example 3');
+                               store.getAt(2).set('age', 16);
+                           }
+                       }
+                   },
+                   '-',
+                   {
+                       text: 'Create New Row',
+                       listeners: {
+                           click: function(button) {
+                               var store = Ext.data.StoreManager.lookup('some_data');
+                               store.add({
+                                   'name': 'New Text',
+                                   'age': 44,
+                                   'other': 'new some other text'
+                               });
+                           }
+                       }
+                   },
+                   '-',
+                   {
+                       text: 'Delete Last Row',
+                       listeners: {
+                           click: function(button) {
+                               var store = Ext.data.StoreManager.lookup('some_data');
+                               store.removeAt(0);
+                           }
+                       }
+                   }
+               ]
+            }
+        ]
+    });
+
+
+});
+
+
+</script>
+
+</head>
+<body>
+</body>
+</html>
